@@ -71,12 +71,16 @@ const Two = () => {
   );
 }
 
+const router = {
+  root: <Root />,
+  two: <Two />
+}
+
 const Content = () => {
   const page = useStore((state) => state.page)
   return (
     <Container>
-      {page === 'root' && <Root />}
-      {page === 'two' && <Two />}
+      {router[page]}
     </Container>
   );
 }
