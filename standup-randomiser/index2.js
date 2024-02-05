@@ -15,17 +15,17 @@ import {
   FormControl,
   FormControlLabel,
   FormGroup,
+  TextField,
   Typography,
 } from "https://esm.run/@mui/material";
 import { createRoot } from "https://esm.run/react-dom@18/client";
 import { create } from "https://esm.run/zustand";
 
 const TEAM = [
-  { name: "Pontos" },
-  { name: "Alcmene" },
-  { name: "Guwisti" },
-  { name: "Attila" },
-  { name: "Rain" },
+  { name: "Goku" },
+  { name: "Vegeta" },
+  { name: "Raditz" },
+  { name: "Piccolo" },
 ];
 
 // made with https://zenoo.github.io/mui-theme-creator/ and https://m2.material.io/inline-tools/color/
@@ -62,9 +62,12 @@ const useStore = create((set) => ({
   members: TEAM,
   selected: [],
   remaining: [],
+  newMember: undefined,
+  setNewMember: (member) => set({ newMember: member }),
   navigateStart: () => set({ page: "start" }),
   navigateCheckIn: () => set({ page: "checkin" }),
   navigateUpdates: () => set({ page: "updates" }),
+  updateMembers: (members) => set({ members }),
   updateSelected: (selected) => set({ selected }),
   updateRemaining: (remaining) => set({ remaining }),
 }));
@@ -80,7 +83,7 @@ const App = () => {
 
 const Header = () => {
   return (
-    <Container>
+    <Container sx={{ mb: 2 }}>
       <Typography variant="h2" component="h1">
         Stand Up Randomiser
       </Typography>
@@ -89,9 +92,11 @@ const Header = () => {
 };
 
 const Start = () => {
+  const updateMembers = useStore((state) => state.updateMembers);
   const updateSelected = useStore((state) => state.updateSelected);
   const navigateCheckIn = useStore((state) => state.navigateCheckIn);
 
+  updateMembers(TEAM);
   updateSelected([]);
 
   return (
@@ -111,9 +116,12 @@ const Start = () => {
 const CheckIn = () => {
   const members = useStore((state) => state.members);
   const selected = useStore((state) => state.selected);
+  const updateMembers = useStore((state) => state.updateMembers);
   const updateSelected = useStore((state) => state.updateSelected);
   const updateRemaining = useStore((state) => state.updateRemaining);
   const navigateUpdates = useStore((state) => state.navigateUpdates);
+  const newMember = useStore((state) => state.newMember);
+  const setNewMember = useStore((state) => state.setNewMember);
 
   const handleChange = (member) => () => {
     const selectedIndex = selected.findIndex(
@@ -134,8 +142,16 @@ const CheckIn = () => {
       (selectedMember) => selectedMember.name === member.name
     ) > -1;
 
+  const handleChangeNewMember = (event) => setNewMember(event.target.value);
+
+  const handleAddMember = () => {
+    updateMembers(members.concat({ name: newMember }));
+    handleChange({ name: newMember })();
+    setNewMember("");
+  };
+
   const handleContinue = () => {
-    updateRemaining(selected.sort(() => Math.random() > 0.5 ? -1 : 1));
+    updateRemaining(selected.sort(() => (Math.random() > 0.5 ? -1 : 1)));
     navigateUpdates();
   };
 
@@ -143,8 +159,10 @@ const CheckIn = () => {
     <Card>
       <CardContent>
         <Box>
-          <Typography paragraph>Select present team members</Typography>
-          <FormControl sx={{ m: 2 }} component="fieldset" variant="standard">
+          <Typography paragraph>
+            Select or enter present team members
+          </Typography>
+          <FormControl sx={{ my: 2 }} component="fieldset" variant="standard">
             <FormGroup>
               {members.map((member) => {
                 return (
@@ -163,13 +181,33 @@ const CheckIn = () => {
             </FormGroup>
           </FormControl>
         </Box>
-        <Button
-          disabled={selected.length < 1}
-          variant="contained"
-          onClick={handleContinue}
-        >
-          Continue
-        </Button>
+        <Box>
+          <TextField
+            id="additional-member-text-field"
+            label="Add another member"
+            variant="outlined"
+            value={newMember}
+            onChange={handleChangeNewMember}
+          />
+          <Button
+            sx={{ mt: 1, ml: 2 }}
+            color="secondary"
+            variant="contained"
+            onClick={handleAddMember}
+            disabled={!newMember || newMember.length < 1}
+          >
+            Add
+          </Button>
+        </Box>
+        <Box sx={{ mt: 3 }}>
+          <Button
+            disabled={selected.length < 1}
+            variant="contained"
+            onClick={handleContinue}
+          >
+            Continue
+          </Button>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -186,16 +224,18 @@ const Updates = () => {
     } else {
       updateRemaining(remaining.slice(1));
     }
-  }
+  };
 
   return (
     <Card>
       <CardContent>
         <Box>
           <Typography paragraph>Next to give an update is...</Typography>
-          <Typography variant='h2'>{remaining[0].name}</Typography>
+          <Typography variant="h2">{remaining[0].name}</Typography>
+        </Box>
+        <Box sx={{ mt: 2 }}>
           <Button variant="contained" onClick={handleNext}>
-            {remaining.length === 1 ? 'Finish' : 'Next'}
+            {remaining.length === 1 ? "Finish" : "Next"}
           </Button>
         </Box>
       </CardContent>
