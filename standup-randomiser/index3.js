@@ -52,6 +52,7 @@ const theme = createTheme({
     mode: "dark",
     primary: {
       main: "#d9df88",
+      dark: "#9f6367", // hover
     },
     secondary: {
       main: "#cadcea",
