@@ -51,14 +51,14 @@ const theme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#9f9456",
+      main: "#d9df88",
     },
     secondary: {
-      main: "#9f5661",
+      main: "#cadcea",
     },
     background: {
-      default: "#161c5d",
-      paper: "#2c367c",
+      default: "#859f63",
+      paper: "#57684a",
     },
     error: {
       main: "#9f5661",
